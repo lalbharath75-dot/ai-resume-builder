@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, send_from_directory, session, redirect
-import google.generativeai as genai
 import os
 import sqlite3
 import hmac
@@ -12,9 +11,8 @@ load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env'))
 app = Flask(__name__, static_folder='static')
 app.secret_key = os.getenv("SECRET_KEY", "super-secret-key-change-this")
 
-# API clients
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-gemini_model = genai.GenerativeModel('gemini-2.5-flash')
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
 RAZORPAY_KEY_ID     = os.getenv("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
@@ -112,8 +110,13 @@ Generate a polished, ATS-friendly resume with:
 - Keep it concise and impactful
 """
 
-    response = gemini_model.generate_content(prompt)
-    resume_text = response.text
+    resp = http_requests.post(
+        f"{GEMINI_URL}?key={GEMINI_API_KEY}",
+        json={"contents": [{"parts": [{"text": prompt}]}]},
+        timeout=60
+    )
+    resp.raise_for_status()
+    resume_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
     session['resume_count'] = count + 1
     return jsonify({"resume": resume_text, "paid": paid})
 
