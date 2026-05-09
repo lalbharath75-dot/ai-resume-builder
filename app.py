@@ -115,8 +115,11 @@ Generate a polished, ATS-friendly resume with:
         json={"contents": [{"parts": [{"text": prompt}]}]},
         timeout=60
     )
-    resp.raise_for_status()
-    resume_text = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+    if not resp.ok:
+        return jsonify({"error": f"AI error: {resp.status_code} {resp.text[:200]}"}), 500
+    data = resp.json()
+    parts = data["candidates"][0]["content"]["parts"]
+    resume_text = next((p["text"] for p in parts if not p.get("thought")), parts[-1]["text"])
     session['resume_count'] = count + 1
     return jsonify({"resume": resume_text, "paid": paid})
 
