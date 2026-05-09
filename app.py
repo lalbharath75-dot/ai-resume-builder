@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory, session, redirect
-import anthropic
+import google.generativeai as genai
 import os
 import sqlite3
 import hmac
@@ -13,7 +13,8 @@ app = Flask(__name__, static_folder='static')
 app.secret_key = os.getenv("SECRET_KEY", "super-secret-key-change-this")
 
 # API clients
-anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+gemini_model = genai.GenerativeModel('gemini-1.5-flash')
 
 RAZORPAY_KEY_ID     = os.getenv("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
@@ -111,13 +112,8 @@ Generate a polished, ATS-friendly resume with:
 - Keep it concise and impactful
 """
 
-    message = anthropic_client.messages.create(
-        model="claude-opus-4-5",
-        max_tokens=1500,
-        messages=[{"role": "user", "content": prompt}]
-    )
-
-    resume_text = message.content[0].text
+    response = gemini_model.generate_content(prompt)
+    resume_text = response.text
     session['resume_count'] = count + 1
     return jsonify({"resume": resume_text, "paid": paid})
 
