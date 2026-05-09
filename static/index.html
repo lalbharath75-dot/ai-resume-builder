@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Resume Builder</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; min-height: 100vh; }
+    header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white; padding: 24px; text-align: center;
+    }
+    header h1 { font-size: 2rem; }
+    header p { opacity: 0.85; margin-top: 6px; }
+    .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+    .card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 24px; }
+    h2 { color: #4a4a8a; margin-bottom: 20px; font-size: 1.2rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .full-width { grid-column: 1 / -1; }
+    label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px; font-weight: 600; }
+    input, textarea { width: 100%; padding: 10px 14px; border: 2px solid #e0e0f0; border-radius: 8px; font-size: 0.95rem; transition: border 0.2s; font-family: inherit; }
+    input:focus, textarea:focus { outline: none; border-color: #667eea; }
+    textarea { resize: vertical; min-height: 100px; }
+    .btn { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 14px 32px; border-radius: 10px; font-size: 1rem; cursor: pointer; width: 100%; font-weight: 600; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-pay { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border: none; padding: 16px 32px; border-radius: 10px; font-size: 1.1rem; cursor: pointer; width: 100%; font-weight: 700; transition: opacity 0.2s; margin-top: 12px; }
+    .btn-pay:hover { opacity: 0.9; }
+    .result { white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.7; color: #333; }
+    .copy-btn { background: #f0f4ff; color: #667eea; border: 2px solid #667eea; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 16px; font-size: 0.9rem; }
+    .copy-btn:hover { background: #667eea; color: white; }
+    .hidden { display: none; }
+    .spinner { text-align: center; padding: 30px; color: #667eea; font-size: 1.1rem; }
+    .badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-left: 10px; }
+    .free-badge { background: #fff3e0; color: #e65100; }
+    .status-bar { background: #f0f4ff; border-radius: 10px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .status-bar span { font-size: 0.9rem; color: #555; }
+
+    /* Paywall Modal */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal { background: white; border-radius: 20px; padding: 40px; max-width: 480px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .modal h2 { font-size: 1.8rem; color: #333; margin-bottom: 10px; }
+    .modal p { color: #666; margin-bottom: 20px; }
+    .price-tag { font-size: 3rem; font-weight: 800; color: #667eea; }
+    .price-tag span { font-size: 1rem; color: #999; font-weight: 400; }
+    .features { list-style: none; text-align: left; margin: 20px 0; }
+    .features li { padding: 8px 0; color: #444; font-size: 0.95rem; }
+    .features li:before { content: "✅ "; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AI Resume Builder</h1>
+    <p>Generate a professional resume in seconds with AI</p>
+  </header>
+
+  <div class="container">
+    <div class="status-bar" id="statusBar">
+      <span id="statusText">Loading...</span>
+      <span id="statusBadge"></span>
+    </div>
+
+    <div class="card">
+      <h2>Your Information</h2>
+      <div class="form-grid">
+        <div>
+          <label>Full Name *</label>
+          <input type="text" id="name" placeholder="e.g. Bharath Lal" />
+        </div>
+        <div>
+          <label>Target Job Title *</label>
+          <input type="text" id="job_title" placeholder="e.g. Software Engineer" />
+        </div>
+        <div>
+          <label>Email *</label>
+          <input type="email" id="email" placeholder="you@example.com" />
+        </div>
+        <div>
+          <label>Phone</label>
+          <input type="text" id="phone" placeholder="+91 98765 43210" />
+        </div>
+        <div class="full-width">
+          <label>Work Experience *</label>
+          <textarea id="experience" placeholder="Describe your work history, roles, achievements..."></textarea>
+        </div>
+        <div class="full-width">
+          <label>Education</label>
+          <textarea id="education" placeholder="Your degrees, certifications, schools..." style="min-height:70px"></textarea>
+        </div>
+        <div class="full-width">
+          <label>Skills</label>
+          <textarea id="skills" placeholder="e.g. Python, Excel, Project Management..." style="min-height:70px"></textarea>
+        </div>
+        <div class="full-width">
+          <button class="btn" onclick="generateResume()" id="genBtn">Generate My Resume</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card hidden" id="resultCard">
+      <h2>Your AI-Generated Resume <span class="badge">Ready</span></h2>
+      <button class="copy-btn" onclick="copyResume()">Copy to Clipboard</button>
+      <div class="result" id="resumeOutput"></div>
+    </div>
+
+    <div class="spinner hidden" id="spinner">Generating your resume with AI...</div>
+  </div>
+
+  <!-- Paywall Modal -->
+  <div class="modal-overlay" id="paywallModal">
+    <div class="modal">
+      <div style="font-size:3rem">🔒</div>
+      <h2>Upgrade to Continue</h2>
+      <p>You've used your free resume. Unlock unlimited access!</p>
+      <div class="price-tag">₹749 <span>one-time</span></div>
+      <ul class="features">
+        <li>Unlimited resume generations</li>
+        <li>AI-powered professional writing</li>
+        <li>All job title templates</li>
+        <li>Pay with UPI, Card, Net Banking</li>
+        <li>Instant access forever</li>
+      </ul>
+      <button class="btn-pay" onclick="startPayment()">Pay ₹749 with Razorpay</button>
+      <p style="margin-top:12px; font-size:0.8rem; color:#aaa;">Secure payment — UPI / Cards / Net Banking accepted</p>
+    </div>
+  </div>
+
+  <script>
+    let razorpayKeyId = '';
+
+    async function loadStatus() {
+      const res = await fetch('/status');
+      const data = await res.json();
+      razorpayKeyId = data.razorpay_key_id;
+      const statusText  = document.getElementById('statusText');
+      const statusBadge = document.getElementById('statusBadge');
+      if (data.paid) {
+        statusText.innerHTML = 'Status: <strong>Unlimited Access</strong> — Generate as many resumes as you want!';
+        statusBadge.innerHTML = '<span class="badge">PRO</span>';
+      } else {
+        const rem = Math.max(0, data.free_limit - data.resume_count);
+        statusText.innerHTML = `Free resumes remaining: <strong>${rem}</strong> of ${data.free_limit}`;
+        statusBadge.innerHTML = '<span class="badge free-badge">FREE</span>';
+      }
+    }
+
+    async function generateResume() {
+      const name       = document.getElementById('name').value.trim();
+      const job_title  = document.getElementById('job_title').value.trim();
+      const email      = document.getElementById('email').value.trim();
+      const experience = document.getElementById('experience').value.trim();
+      if (!name || !job_title || !email || !experience) {
+        alert('Please fill in Name, Job Title, Email, and Work Experience!');
+        return;
+      }
+      document.getElementById('genBtn').disabled = true;
+      document.getElementById('spinner').classList.remove('hidden');
+      document.getElementById('resultCard').classList.add('hidden');
+      const payload = { name, job_title, email, phone: document.getElementById('phone').value, experience, education: document.getElementById('education').value, skills: document.getElementById('skills').value };
+      try {
+        const res = await fetch('/generate-resume', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+        if (res.status === 403) { document.getElementById('paywallModal').classList.add('active'); return; }
+        const data = await res.json();
+        document.getElementById('resumeOutput').textContent = data.resume;
+        document.getElementById('resultCard').classList.remove('hidden');
+        loadStatus();
+      } catch(e) {
+        alert('Error generating resume. Make sure the server is running!');
+      } finally {
+        document.getElementById('genBtn').disabled = false;
+        document.getElementById('spinner').classList.add('hidden');
+      }
+    }
+
+    async function startPayment() {
+      const orderRes  = await fetch('/create-order', { method: 'POST' });
+      const orderData = await orderRes.json();
+      if (orderData.error) { alert('Payment error: ' + orderData.error); return; }
+
+      const options = {
+        key: razorpayKeyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'AI Resume Builder',
+        description: 'Unlimited Resume Access',
+        order_id: orderData.id,
+        handler: async function(response) {
+          const verifyRes = await fetch('/verify-payment', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+              razorpay_order_id:   response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature:  response.razorpay_signature
+            })
+          });
+          const result = await verifyRes.json();
+          if (result.success) {
+            document.getElementById('paywallModal').classList.remove('active');
+            window.location.href = '/success';
+          } else {
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: { name: document.getElementById('name').value, email: document.getElementById('email').value, contact: document.getElementById('phone').value },
+        theme: { color: '#667eea' }
+      };
+      const rzp = new Razorpay(options);
+      rzp.open();
+    }
+
+    function copyResume() {
+      const text = document.getElementById('resumeOutput').textContent;
+      navigator.clipboard.writeText(text).then(() => alert('Resume copied!'));
+    }
+
+    loadStatus();
+  </script>
+</body>
+</html>
