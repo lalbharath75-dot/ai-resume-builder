@@ -77,38 +77,60 @@ def generate_resume():
     if not paid and count >= FREE_LIMIT:
         return jsonify({"error": "free_limit_reached"}), 403
 
-    data       = request.json
-    name       = data.get('name', '')
-    email      = data.get('email', '')
-    phone      = data.get('phone', '')
-    experience = data.get('experience', '')
-    education  = data.get('education', '')
-    skills     = data.get('skills', '')
-    job_title  = data.get('job_title', '')
+    data           = request.json
+    name           = data.get('name', '')
+    email          = data.get('email', '')
+    phone          = data.get('phone', '')
+    location       = data.get('location', '')
+    links          = data.get('links', '')
+    experience     = data.get('experience', '')
+    education      = data.get('education', '')
+    skills         = data.get('skills', '')
+    certifications = data.get('certifications', '')
+    job_title      = data.get('job_title', '')
 
-    prompt = f"""Create a professional resume for the following person. Format it cleanly with clear sections.
+    contact_parts = [x for x in [email, phone, location, links] if x]
+    contact_line  = ' | '.join(contact_parts)
 
+    prompt = f"""You are an elite resume writer trusted by Fortune 500 recruiters. Create a stunning, ATS-optimized resume.
+
+CANDIDATE INFO:
 Name: {name}
-Email: {email}
-Phone: {phone}
-Target Job Title: {job_title}
+Contact: {contact_line}
+Target Role: {job_title}
+Experience: {experience}
+Education: {education}
+Skills: {skills}
+Certifications/Achievements: {certifications}
 
-Work Experience:
-{experience}
+FORMAT RULES (follow exactly):
+1. Start with: # {name}
+2. Second line: contact details (email | phone | location | links)
+3. Third line: *{job_title}* (wrapped in single asterisks)
+4. Then: ## PROFESSIONAL SUMMARY
+   Write 3 powerful sentences: who they are, top achievement, what value they bring to {job_title} roles.
+5. Then: ## WORK EXPERIENCE
+   For each role:
+   **Job Title — Company Name** | City | Start Date – End Date
+   - Achievement bullet (start with strong action verb, include numbers/metrics where possible)
+   - Achievement bullet
+   - Achievement bullet (3-5 bullets per role)
+6. Then: ## EDUCATION
+   **Degree — Institution** | Year | GPA/Score if provided
+7. Then: ## SKILLS
+   List all skills comma-separated (the UI will render them as visual tags)
+8. If certifications exist: ## CERTIFICATIONS & ACHIEVEMENTS
+   - Each one as a bullet
 
-Education:
-{education}
+WRITING RULES:
+- Every bullet starts with a powerful action verb (Engineered, Spearheaded, Optimized, Delivered, Reduced, Increased, Built, Led, etc.)
+- Quantify achievements: use numbers, %, time saved, users impacted wherever possible
+- If raw input lacks numbers, intelligently estimate realistic ones based on context
+- Write in a confident, professional tone
+- Make it specific to the {job_title} role — use relevant industry keywords for ATS
+- Total length: 400-550 words of actual content
 
-Skills:
-{skills}
-
-Generate a polished, ATS-friendly resume with:
-- Professional summary
-- Work Experience (with bullet points highlighting achievements)
-- Education
-- Skills section
-- Keep it concise and impactful
-"""
+Output ONLY the resume text. No explanations, no preamble."""
 
     resp = http_requests.post(
         f"{GEMINI_URL}?key={GEMINI_API_KEY}",

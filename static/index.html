@@ -1,223 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Resume Builder</title>
+  <title>ResumeAI — Build a Job-Winning Resume in Seconds</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; min-height: 100vh; }
-    header {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white; padding: 24px; text-align: center;
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --primary:#6c63ff;--primary-dark:#5a52e0;--accent:#ff6584;
+      --bg:#f7f8fc;--card:#ffffff;--text:#1a1a2e;--muted:#6b7280;
+      --border:#e5e7eb;--success:#10b981;
     }
-    header h1 { font-size: 2rem; }
-    header p { opacity: 0.85; margin-top: 6px; }
-    .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
-    .card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 24px; }
-    h2 { color: #4a4a8a; margin-bottom: 20px; font-size: 1.2rem; }
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .full-width { grid-column: 1 / -1; }
-    label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 6px; font-weight: 600; }
-    input, textarea { width: 100%; padding: 10px 14px; border: 2px solid #e0e0f0; border-radius: 8px; font-size: 0.95rem; transition: border 0.2s; font-family: inherit; }
-    input:focus, textarea:focus { outline: none; border-color: #667eea; }
-    textarea { resize: vertical; min-height: 100px; }
-    .btn { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; padding: 14px 32px; border-radius: 10px; font-size: 1rem; cursor: pointer; width: 100%; font-weight: 600; transition: opacity 0.2s; }
-    .btn:hover { opacity: 0.9; }
-    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .btn-pay { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; border: none; padding: 16px 32px; border-radius: 10px; font-size: 1.1rem; cursor: pointer; width: 100%; font-weight: 700; transition: opacity 0.2s; margin-top: 12px; }
-    .btn-pay:hover { opacity: 0.9; }
-    .result { white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 0.9rem; line-height: 1.7; color: #333; }
-    .copy-btn { background: #f0f4ff; color: #667eea; border: 2px solid #667eea; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; margin-bottom: 16px; font-size: 0.9rem; }
-    .copy-btn:hover { background: #667eea; color: white; }
-    .hidden { display: none; }
-    .spinner { text-align: center; padding: 30px; color: #667eea; font-size: 1.1rem; }
-    .badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-left: 10px; }
-    .free-badge { background: #fff3e0; color: #e65100; }
-    .status-bar { background: #f0f4ff; border-radius: 10px; padding: 12px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
-    .status-bar span { font-size: 0.9rem; color: #555; }
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
-    /* Paywall Modal */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; }
-    .modal-overlay.active { display: flex; }
-    .modal { background: white; border-radius: 20px; padding: 40px; max-width: 480px; width: 90%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-    .modal h2 { font-size: 1.8rem; color: #333; margin-bottom: 10px; }
-    .modal p { color: #666; margin-bottom: 20px; }
-    .price-tag { font-size: 3rem; font-weight: 800; color: #667eea; }
-    .price-tag span { font-size: 1rem; color: #999; font-weight: 400; }
-    .features { list-style: none; text-align: left; margin: 20px 0; }
-    .features li { padding: 8px 0; color: #444; font-size: 0.95rem; }
-    .features li:before { content: "✅ "; }
+    /* ── HEADER ── */
+    header{
+      background:linear-gradient(135deg,#6c63ff 0%,#3b3097 100%);
+      padding:60px 20px 50px;text-align:center;position:relative;overflow:hidden;
+    }
+    header::before{content:'';position:absolute;top:-60px;left:-60px;width:300px;height:300px;
+      background:rgba(255,255,255,0.06);border-radius:50%}
+    header::after{content:'';position:absolute;bottom:-80px;right:-40px;width:250px;height:250px;
+      background:rgba(255,255,255,0.05);border-radius:50%}
+    .header-tag{display:inline-block;background:rgba(255,255,255,0.15);color:#fff;
+      font-size:0.75rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;
+      padding:6px 16px;border-radius:50px;margin-bottom:20px;backdrop-filter:blur(10px)}
+    header h1{font-family:'Playfair Display',serif;font-size:3rem;color:#fff;line-height:1.2;
+      margin-bottom:14px;position:relative;z-index:1}
+    header h1 span{color:#ffd700}
+    header p{color:rgba(255,255,255,0.8);font-size:1.05rem;max-width:500px;margin:0 auto;
+      position:relative;z-index:1}
+    .header-stats{display:flex;justify-content:center;gap:40px;margin-top:32px;position:relative;z-index:1}
+    .stat{text-align:center}
+    .stat strong{display:block;font-size:1.5rem;font-weight:800;color:#fff}
+    .stat span{font-size:0.78rem;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:1px}
+
+    /* ── LAYOUT ── */
+    .container{max-width:860px;margin:0 auto;padding:40px 20px}
+
+    /* ── STATUS BAR ── */
+    .status-pill{
+      display:flex;align-items:center;justify-content:space-between;
+      background:#fff;border:1px solid var(--border);border-radius:50px;
+      padding:10px 20px;margin-bottom:28px;box-shadow:0 2px 8px rgba(0,0,0,0.06);
+    }
+    .status-dot{width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:8px;
+      display:inline-block;box-shadow:0 0 0 3px rgba(16,185,129,0.2)}
+    .status-dot.orange{background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,0.2)}
+    .status-left{display:flex;align-items:center;font-size:0.88rem;color:var(--muted);font-weight:500}
+    .badge{padding:4px 12px;border-radius:50px;font-size:0.75rem;font-weight:700;letter-spacing:0.5px}
+    .badge-free{background:#fff7ed;color:#ea580c}
+    .badge-pro{background:#f0fdf4;color:#16a34a}
+
+    /* ── CARD ── */
+    .card{background:#fff;border-radius:20px;padding:32px;
+      box-shadow:0 4px 24px rgba(0,0,0,0.06);margin-bottom:24px;border:1px solid var(--border)}
+    .card-title{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:24px;
+      display:flex;align-items:center;gap:10px}
+    .card-title .icon{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;
+      justify-content:center;font-size:1rem}
+    .icon-blue{background:#eff6ff}.icon-purple{background:#f5f3ff}.icon-green{background:#f0fdf4}
+
+    /* ── FORM ── */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .full{grid-column:1/-1}
+    .field label{display:block;font-size:0.8rem;font-weight:600;color:var(--muted);
+      margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+    .field input,.field textarea{
+      width:100%;padding:12px 16px;border:1.5px solid var(--border);border-radius:12px;
+      font-size:0.95rem;font-family:'Inter',sans-serif;color:var(--text);
+      transition:all 0.2s;background:#fafafa;
+    }
+    .field input:focus,.field textarea:focus{
+      outline:none;border-color:var(--primary);background:#fff;
+      box-shadow:0 0 0 4px rgba(108,99,255,0.08);
+    }
+    .field textarea{resize:vertical;min-height:110px;line-height:1.6}
+    .field input::placeholder,.field textarea::placeholder{color:#c4c9d4}
+    .hint{font-size:0.76rem;color:#9ca3af;margin-top:5px}
+
+    /* ── GENERATE BUTTON ── */
+    .btn-generate{
+      width:100%;padding:16px;border:none;border-radius:14px;
+      background:linear-gradient(135deg,#6c63ff,#3b3097);
+      color:#fff;font-size:1rem;font-weight:700;cursor:pointer;
+      transition:all 0.2s;letter-spacing:0.3px;position:relative;overflow:hidden;
+    }
+    .btn-generate:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(108,99,255,0.4)}
+    .btn-generate:disabled{opacity:0.7;cursor:not-allowed;transform:none}
+    .btn-generate .btn-inner{display:flex;align-items:center;justify-content:center;gap:10px}
+
+    /* ── LOADING ── */
+    .loading-box{text-align:center;padding:50px 20px}
+    .loader{width:48px;height:48px;border:4px solid #e5e7eb;border-top-color:var(--primary);
+      border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 20px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-box p{color:var(--muted);font-size:0.95rem}
+    .loading-box .dots::after{content:'...';animation:dots 1.5s infinite}
+    @keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
+
+    /* ── RESUME OUTPUT ── */
+    .resume-actions{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+    .action-btn{
+      display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:10px;
+      font-size:0.85rem;font-weight:600;cursor:pointer;transition:all 0.2s;border:none;
+    }
+    .action-btn-outline{background:#f5f3ff;color:var(--primary);border:1.5px solid #ddd6fe}
+    .action-btn-outline:hover{background:#ede9fe;border-color:var(--primary)}
+    .action-btn-solid{background:linear-gradient(135deg,#6c63ff,#3b3097);color:#fff}
+    .action-btn-solid:hover{box-shadow:0 4px 15px rgba(108,99,255,0.4);transform:translateY(-1px)}
+
+    /* ── RENDERED RESUME ── */
+    #resumeDisplay{
+      background:#fff;border:1px solid #e5e7eb;border-radius:12px;
+      padding:48px 56px;font-family:'Inter',sans-serif;color:#1a1a2e;line-height:1.7;
+    }
+    #resumeDisplay h1{font-size:2rem;font-weight:800;color:#1a1a2e;margin-bottom:6px;letter-spacing:-0.5px}
+    #resumeDisplay .contact-line{font-size:0.9rem;color:#6b7280;margin-bottom:4px}
+    #resumeDisplay .job-title-line{font-size:1rem;font-weight:600;color:var(--primary);margin-bottom:24px}
+    #resumeDisplay hr{border:none;border-top:2px solid #6c63ff;margin:20px 0;opacity:0.3}
+    #resumeDisplay h2{
+      font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+      color:var(--primary);margin:28px 0 12px;padding-bottom:6px;
+      border-bottom:2px solid #ede9fe;
+    }
+    #resumeDisplay h3{font-size:1rem;font-weight:700;color:#1a1a2e;margin-bottom:2px}
+    #resumeDisplay .job-meta{font-size:0.85rem;color:#6b7280;margin-bottom:8px;font-style:italic}
+    #resumeDisplay p{font-size:0.93rem;color:#374151;margin-bottom:8px}
+    #resumeDisplay ul{padding-left:20px;margin-bottom:8px}
+    #resumeDisplay li{font-size:0.93rem;color:#374151;margin-bottom:4px}
+    #resumeDisplay .skills-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    #resumeDisplay .skill-tag{
+      background:#f5f3ff;color:var(--primary);padding:4px 14px;
+      border-radius:50px;font-size:0.82rem;font-weight:600;border:1px solid #ddd6fe;
+    }
+    #resumeDisplay .summary-text{
+      background:#f8f7ff;border-left:3px solid var(--primary);
+      padding:14px 18px;border-radius:0 8px 8px 0;font-size:0.93rem;color:#374151;
+    }
+
+    /* ── PAYWALL MODAL ── */
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);
+      z-index:999;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+    .overlay.on{display:flex}
+    .modal{background:#fff;border-radius:24px;padding:44px 36px;max-width:460px;width:92%;text-align:center}
+    .modal-icon{font-size:3.5rem;margin-bottom:16px}
+    .modal h2{font-size:1.7rem;font-weight:800;margin-bottom:10px}
+    .modal .sub{color:var(--muted);margin-bottom:24px;font-size:0.95rem}
+    .price-display{margin:20px 0}
+    .price-amount{font-size:3.5rem;font-weight:800;color:var(--primary);line-height:1}
+    .price-label{font-size:0.9rem;color:var(--muted)}
+    .features{list-style:none;text-align:left;margin:24px 0;background:#f8f7ff;
+      border-radius:14px;padding:20px 24px}
+    .features li{padding:7px 0;font-size:0.93rem;color:#374151;border-bottom:1px solid #ede9fe}
+    .features li:last-child{border:none}
+    .features li::before{content:"✓ ";color:var(--success);font-weight:700}
+    .btn-pay{width:100%;padding:17px;border:none;border-radius:14px;
+      background:linear-gradient(135deg,#10b981,#059669);color:#fff;
+      font-size:1.05rem;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:10px}
+    .btn-pay:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(16,185,129,0.4)}
+    .secure-note{font-size:0.78rem;color:#9ca3af;margin-top:12px}
+
+    .hidden{display:none!important}
+    @media(max-width:600px){
+      header h1{font-size:2rem}.form-grid{grid-template-columns:1fr}
+      #resumeDisplay{padding:28px 22px}
+    }
+
+    @media print{
+      header,.status-pill,.card:first-of-type,.resume-actions,.overlay{display:none!important}
+      .card{box-shadow:none;border:none;padding:0}
+      #resumeDisplay{border:none;padding:0}
+    }
   </style>
 </head>
 <body>
-  <header>
-    <h1>AI Resume Builder</h1>
-    <p>Generate a professional resume in seconds with AI</p>
-  </header>
 
-  <div class="container">
-    <div class="status-bar" id="statusBar">
-      <span id="statusText">Loading...</span>
-      <span id="statusBadge"></span>
+<header>
+  <div class="header-tag">AI-Powered</div>
+  <h1>Build a <span>Job-Winning</span> Resume</h1>
+  <p>Professional, ATS-optimized resumes created by AI in under 30 seconds</p>
+  <div class="header-stats">
+    <div class="stat"><strong>30s</strong><span>Generation time</span></div>
+    <div class="stat"><strong>ATS</strong><span>Optimized</span></div>
+    <div class="stat"><strong>100%</strong><span>Professional</span></div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="status-pill" id="statusBar">
+    <div class="status-left">
+      <span class="status-dot orange" id="statusDot"></span>
+      <span id="statusText">Loading status...</span>
     </div>
+    <span class="badge badge-free" id="statusBadge">FREE</span>
+  </div>
 
-    <div class="card">
-      <h2>Your Information</h2>
-      <div class="form-grid">
-        <div>
-          <label>Full Name *</label>
-          <input type="text" id="name" placeholder="e.g. Bharath Lal" />
-        </div>
-        <div>
-          <label>Target Job Title *</label>
-          <input type="text" id="job_title" placeholder="e.g. Software Engineer" />
-        </div>
-        <div>
-          <label>Email *</label>
-          <input type="email" id="email" placeholder="you@example.com" />
-        </div>
-        <div>
-          <label>Phone</label>
-          <input type="text" id="phone" placeholder="+91 98765 43210" />
-        </div>
-        <div class="full-width">
-          <label>Work Experience *</label>
-          <textarea id="experience" placeholder="Describe your work history, roles, achievements..."></textarea>
-        </div>
-        <div class="full-width">
-          <label>Education</label>
-          <textarea id="education" placeholder="Your degrees, certifications, schools..." style="min-height:70px"></textarea>
-        </div>
-        <div class="full-width">
-          <label>Skills</label>
-          <textarea id="skills" placeholder="e.g. Python, Excel, Project Management..." style="min-height:70px"></textarea>
-        </div>
-        <div class="full-width">
-          <button class="btn" onclick="generateResume()" id="genBtn">Generate My Resume</button>
-        </div>
+  <div class="card">
+    <div class="card-title"><div class="icon icon-blue">👤</div> Personal Details</div>
+    <div class="form-grid">
+      <div class="field"><label>Full Name *</label><input id="name" placeholder="e.g. Priya Sharma"/></div>
+      <div class="field"><label>Target Job Title *</label><input id="job_title" placeholder="e.g. Data Analyst"/></div>
+      <div class="field"><label>Email *</label><input type="email" id="email" placeholder="you@gmail.com"/></div>
+      <div class="field"><label>Phone</label><input id="phone" placeholder="+91 98765 43210"/></div>
+      <div class="field"><label>Location</label><input id="location" placeholder="e.g. Bangalore, India"/></div>
+      <div class="field"><label>LinkedIn / GitHub (optional)</label><input id="links" placeholder="linkedin.com/in/yourname"/></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon icon-purple">💼</div> Work Experience</div>
+    <div class="field">
+      <textarea id="experience" placeholder="List each job with: Company name, your role, dates, and key achievements.&#10;&#10;Example:&#10;TechCorp, Software Engineer, Jan 2022 – Present&#10;- Built REST APIs serving 50k users daily&#10;- Reduced load time by 40% through query optimization&#10;&#10;StartupXYZ, Intern, Jun 2021 – Dec 2021&#10;- Developed React dashboard for analytics" style="min-height:160px"></textarea>
+      <div class="hint">More detail = better resume. Include numbers and achievements where possible.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="icon icon-green">🎓</div> Education & Skills</div>
+    <div class="form-grid">
+      <div class="field full">
+        <label>Education</label>
+        <textarea id="education" placeholder="e.g. B.Tech Computer Science — VIT University, 2022 (CGPA: 8.5)" style="min-height:80px"></textarea>
+      </div>
+      <div class="field full">
+        <label>Skills</label>
+        <textarea id="skills" placeholder="e.g. Python, SQL, Power BI, Excel, Machine Learning, Tableau, Communication, Problem Solving" style="min-height:80px"></textarea>
+      </div>
+      <div class="field full">
+        <label>Certifications / Achievements (optional)</label>
+        <textarea id="certifications" placeholder="e.g. AWS Certified Developer, Google Data Analytics Certificate, Hackathon winner 2023" style="min-height:70px"></textarea>
+      </div>
+      <div class="field full">
+        <button class="btn-generate" onclick="generateResume()" id="genBtn">
+          <div class="btn-inner">⚡ Generate My Professional Resume</div>
+        </button>
       </div>
     </div>
-
-    <div class="card hidden" id="resultCard">
-      <h2>Your AI-Generated Resume <span class="badge">Ready</span></h2>
-      <button class="copy-btn" onclick="copyResume()">Copy to Clipboard</button>
-      <div class="result" id="resumeOutput"></div>
-    </div>
-
-    <div class="spinner hidden" id="spinner">Generating your resume with AI...</div>
   </div>
 
-  <!-- Paywall Modal -->
-  <div class="modal-overlay" id="paywallModal">
-    <div class="modal">
-      <div style="font-size:3rem">🔒</div>
-      <h2>Upgrade to Continue</h2>
-      <p>You've used your free resume. Unlock unlimited access!</p>
-      <div class="price-tag">₹749 <span>one-time</span></div>
-      <ul class="features">
-        <li>Unlimited resume generations</li>
-        <li>AI-powered professional writing</li>
-        <li>All job title templates</li>
-        <li>Pay with UPI, Card, Net Banking</li>
-        <li>Instant access forever</li>
-      </ul>
-      <button class="btn-pay" onclick="startPayment()">Pay ₹749 with Razorpay</button>
-      <p style="margin-top:12px; font-size:0.8rem; color:#aaa;">Secure payment — UPI / Cards / Net Banking accepted</p>
+  <div id="loadingBox" class="card hidden">
+    <div class="loading-box">
+      <div class="loader"></div>
+      <p>AI is crafting your resume<span class="dots"></span></p>
+      <p style="margin-top:8px;font-size:0.82rem;color:#9ca3af">This takes about 15–20 seconds</p>
     </div>
   </div>
 
-  <script>
-    let razorpayKeyId = '';
+  <div id="resultCard" class="card hidden">
+    <div class="card-title"><div class="icon icon-purple">📄</div> Your Professional Resume</div>
+    <div class="resume-actions">
+      <button class="action-btn action-btn-outline" onclick="copyText()">📋 Copy Text</button>
+      <button class="action-btn action-btn-solid" onclick="window.print()">🖨️ Download PDF</button>
+    </div>
+    <div id="resumeDisplay"></div>
+  </div>
+</div>
 
-    async function loadStatus() {
-      const res = await fetch('/status');
-      const data = await res.json();
-      razorpayKeyId = data.razorpay_key_id;
-      const statusText  = document.getElementById('statusText');
-      const statusBadge = document.getElementById('statusBadge');
-      if (data.paid) {
-        statusText.innerHTML = 'Status: <strong>Unlimited Access</strong> — Generate as many resumes as you want!';
-        statusBadge.innerHTML = '<span class="badge">PRO</span>';
-      } else {
-        const rem = Math.max(0, data.free_limit - data.resume_count);
-        statusText.innerHTML = `Free resumes remaining: <strong>${rem}</strong> of ${data.free_limit}`;
-        statusBadge.innerHTML = '<span class="badge free-badge">FREE</span>';
-      }
+<!-- PAYWALL -->
+<div class="overlay" id="paywallModal">
+  <div class="modal">
+    <div class="modal-icon">🚀</div>
+    <h2>Unlock Unlimited Resumes</h2>
+    <p class="sub">You've used your 1 free resume. Upgrade once, generate forever.</p>
+    <div class="price-display">
+      <div class="price-amount">₹749</div>
+      <div class="price-label">one-time payment — lifetime access</div>
+    </div>
+    <ul class="features">
+      <li>Unlimited AI resume generations</li>
+      <li>All job titles & industries supported</li>
+      <li>ATS-optimized, recruiter-approved format</li>
+      <li>PDF download included</li>
+      <li>Pay via UPI, Card, Net Banking</li>
+    </ul>
+    <button class="btn-pay" onclick="startPayment()">Pay ₹749 — Unlock Forever</button>
+    <div class="secure-note">🔒 100% secure via Razorpay · No subscription · No hidden fees</div>
+  </div>
+</div>
+
+<script>
+let razorpayKeyId = '';
+let rawResumeText = '';
+
+async function loadStatus() {
+  try {
+    const res = await fetch('/status');
+    const d = await res.json();
+    razorpayKeyId = d.razorpay_key_id;
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    const badge = document.getElementById('statusBadge');
+    if (d.paid) {
+      dot.className = 'status-dot';
+      txt.innerHTML = 'Status: <strong>Unlimited Access</strong> — Generate as many as you want!';
+      badge.textContent = 'PRO'; badge.className = 'badge badge-pro';
+    } else {
+      const rem = Math.max(0, d.free_limit - d.resume_count);
+      dot.className = rem > 0 ? 'status-dot' : 'status-dot orange';
+      txt.innerHTML = `Free resumes remaining: <strong>${rem}</strong> of ${d.free_limit}`;
+      badge.textContent = 'FREE'; badge.className = 'badge badge-free';
     }
+  } catch(e){}
+}
 
-    async function generateResume() {
-      const name       = document.getElementById('name').value.trim();
-      const job_title  = document.getElementById('job_title').value.trim();
-      const email      = document.getElementById('email').value.trim();
-      const experience = document.getElementById('experience').value.trim();
-      if (!name || !job_title || !email || !experience) {
-        alert('Please fill in Name, Job Title, Email, and Work Experience!');
-        return;
-      }
-      document.getElementById('genBtn').disabled = true;
-      document.getElementById('spinner').classList.remove('hidden');
-      document.getElementById('resultCard').classList.add('hidden');
-      const payload = { name, job_title, email, phone: document.getElementById('phone').value, experience, education: document.getElementById('education').value, skills: document.getElementById('skills').value };
-      try {
-        const res = await fetch('/generate-resume', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-        if (res.status === 403) { document.getElementById('paywallModal').classList.add('active'); return; }
-        const data = await res.json();
-        document.getElementById('resumeOutput').textContent = data.resume;
-        document.getElementById('resultCard').classList.remove('hidden');
-        loadStatus();
-      } catch(e) {
-        alert('Error generating resume. Make sure the server is running!');
-      } finally {
-        document.getElementById('genBtn').disabled = false;
-        document.getElementById('spinner').classList.add('hidden');
-      }
+async function generateResume() {
+  const name = document.getElementById('name').value.trim();
+  const job_title = document.getElementById('job_title').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const experience = document.getElementById('experience').value.trim();
+  if (!name || !job_title || !email || !experience) {
+    alert('Please fill in your Name, Job Title, Email, and Work Experience.');
+    return;
+  }
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('loadingBox').classList.remove('hidden');
+  document.getElementById('resultCard').classList.add('hidden');
+  const payload = {
+    name, job_title, email,
+    phone: document.getElementById('phone').value,
+    location: document.getElementById('location').value,
+    links: document.getElementById('links').value,
+    experience,
+    education: document.getElementById('education').value,
+    skills: document.getElementById('skills').value,
+    certifications: document.getElementById('certifications').value
+  };
+  try {
+    const res = await fetch('/generate-resume', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    if (res.status === 403) {
+      document.getElementById('paywallModal').classList.add('on'); return;
     }
-
-    async function startPayment() {
-      const orderRes  = await fetch('/create-order', { method: 'POST' });
-      const orderData = await orderRes.json();
-      if (orderData.error) { alert('Payment error: ' + orderData.error); return; }
-
-      const options = {
-        key: razorpayKeyId,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: 'AI Resume Builder',
-        description: 'Unlimited Resume Access',
-        order_id: orderData.id,
-        handler: async function(response) {
-          const verifyRes = await fetch('/verify-payment', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({
-              razorpay_order_id:   response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature:  response.razorpay_signature
-            })
-          });
-          const result = await verifyRes.json();
-          if (result.success) {
-            document.getElementById('paywallModal').classList.remove('active');
-            window.location.href = '/success';
-          } else {
-            alert('Payment verification failed. Please contact support.');
-          }
-        },
-        prefill: { name: document.getElementById('name').value, email: document.getElementById('email').value, contact: document.getElementById('phone').value },
-        theme: { color: '#667eea' }
-      };
-      const rzp = new Razorpay(options);
-      rzp.open();
-    }
-
-    function copyResume() {
-      const text = document.getElementById('resumeOutput').textContent;
-      navigator.clipboard.writeText(text).then(() => alert('Resume copied!'));
-    }
-
+    if (!res.ok) { const e = await res.json(); throw new Error(e.error||'Server error'); }
+    const data = await res.json();
+    rawResumeText = data.resume;
+    renderResume(data.resume);
+    document.getElementById('resultCard').classList.remove('hidden');
+    document.getElementById('resultCard').scrollIntoView({behavior:'smooth',block:'start'});
     loadStatus();
-  </script>
+  } catch(e) {
+    alert('Error: ' + e.message);
+  } finally {
+    document.getElementById('genBtn').disabled = false;
+    document.getElementById('loadingBox').classList.add('hidden');
+  }
+}
+
+function renderResume(text) {
+  // Convert markdown-style text to nicely formatted HTML
+  const lines = text.split('\n');
+  let html = '';
+  let inList = false;
+  let isFirst = true;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) { if (inList) { html += '</ul>'; inList = false; } html += '<br>'; continue; }
+
+    // Close list if needed
+    if (!line.startsWith('-') && !line.startsWith('•') && inList) {
+      html += '</ul>'; inList = false;
+    }
+
+    if (line.startsWith('# ') || (isFirst && !line.startsWith('#'))) {
+      // Name / H1
+      const name = line.replace(/^#\s*/,'');
+      html += `<h1>${esc(name)}</h1>`;
+      isFirst = false;
+    } else if (line.startsWith('## ')) {
+      html += `<h2>${esc(line.replace('## ',''))}</h2>`;
+    } else if (line.startsWith('### ')) {
+      html += `<h3>${esc(line.replace('### ',''))}</h3>`;
+    } else if (line.startsWith('**') && line.endsWith('**') && line.includes('|')) {
+      // Contact line
+      html += `<p class="contact-line">${esc(line.replace(/\*\*/g,''))}</p>`;
+    } else if (line.startsWith('*') && line.endsWith('*') && !line.startsWith('**')) {
+      html += `<p class="job-title-line">${esc(line.replace(/\*/g,''))}</p>`;
+    } else if (line.match(/^\*\*(.+)\*\*\s*[|·—-]/)) {
+      // Job header line
+      html += `<h3>${fmt(line)}</h3>`;
+    } else if (line.match(/^_(.+)_$/) || line.match(/^\*(.+)\*$/) || line.match(/^[A-Z].+,\s+\d{4}/)) {
+      html += `<p class="job-meta">${fmt(line)}</p>`;
+    } else if (line.startsWith('-') || line.startsWith('•')) {
+      if (!inList) { html += '<ul>'; inList = true; }
+      html += `<li>${fmt(line.replace(/^[-•]\s*/,''))}</li>`;
+    } else if (line.match(/^---+$/)) {
+      html += '<hr>';
+    } else if (i === 1 || i === 2) {
+      html += `<p class="contact-line">${fmt(line)}</p>`;
+    } else {
+      // Check if it looks like a section summary
+      if (line.length > 60) {
+        html += `<p class="summary-text">${fmt(line)}</p>`;
+      } else {
+        html += `<p>${fmt(line)}</p>`;
+      }
+    }
+  }
+  if (inList) html += '</ul>';
+
+  // Wrap skills as tags if in skills section
+  document.getElementById('resumeDisplay').innerHTML = html;
+
+  // Post-process: turn comma-separated skill lines into tags
+  document.querySelectorAll('#resumeDisplay h2').forEach(h2 => {
+    if (h2.textContent.toLowerCase().includes('skill')) {
+      let next = h2.nextElementSibling;
+      while (next && next.tagName === 'P') {
+        const skills = next.textContent.split(/[,;|]/).map(s=>s.trim()).filter(Boolean);
+        if (skills.length > 2) {
+          const div = document.createElement('div');
+          div.className = 'skills-grid';
+          skills.forEach(s => {
+            const t = document.createElement('span');
+            t.className = 'skill-tag'; t.textContent = s;
+            div.appendChild(t);
+          });
+          next.replaceWith(div);
+        }
+        next = next.nextElementSibling;
+      }
+    }
+  });
+}
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fmt(t){
+  return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>')
+    .replace(/__(.+?)__/g,'<strong>$1</strong>')
+    .replace(/_(.+?)_/g,'<em>$1</em>');
+}
+
+function copyText() {
+  navigator.clipboard.writeText(rawResumeText).then(() => {
+    const btn = event.target; btn.textContent = '✅ Copied!';
+    setTimeout(() => btn.textContent = '📋 Copy Text', 2000);
+  });
+}
+
+async function startPayment() {
+  try {
+    const orderRes = await fetch('/create-order',{method:'POST'});
+    const order = await orderRes.json();
+    if (order.error) { alert('Payment error: '+order.error); return; }
+    const options = {
+      key: razorpayKeyId, amount: order.amount, currency: order.currency,
+      name: 'ResumeAI', description: 'Lifetime Unlimited Access',
+      order_id: order.id,
+      handler: async function(response) {
+        const vRes = await fetch('/verify-payment',{
+          method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({razorpay_order_id:response.razorpay_order_id,
+            razorpay_payment_id:response.razorpay_payment_id,
+            razorpay_signature:response.razorpay_signature})
+        });
+        const result = await vRes.json();
+        if (result.success) {
+          document.getElementById('paywallModal').classList.remove('on');
+          window.location.href = '/success';
+        } else { alert('Payment verification failed. Contact support.'); }
+      },
+      prefill:{name:document.getElementById('name').value,email:document.getElementById('email').value,contact:document.getElementById('phone').value},
+      theme:{color:'#6c63ff'}
+    };
+    new Razorpay(options).open();
+  } catch(e) { alert('Payment error. Try again.'); }
+}
+
+loadStatus();
+</script>
 </body>
 </html>
